@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/12 19:21:13 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/12 20:24:20 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,35 +57,43 @@ void	ft_initstruct(t_philos *s)
 	s->tmusteat = -1;
 }
 
+int	ft_gettime()
+{
+	struct timeval currentTime;
+
+	if (gettimeofday(&currentTime, NULL) != 0)
+		return (ft_printf("Error getting time"), 0);
+	return (currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000);
+}
+
 void	*ft_runphilos(void *arg)
 {
-	int id;
+	t_philostats philo;
 
-	id = *(int*)arg;
-	ft_printf("%i\n", id);
-	free(arg);
+	philo = *(t_philostats*)arg;
+	ft_printf("Hello i am philo %i\n", philo.id);
+	ft_printf("%i", ft_gettime());
 	return (0);
 }
 
 int	ft_startphilos(t_philos *s)
 {
 	int	i;
-	int	*a;
 
+	s->philo = (t_philostats *)malloc(s->nphilo * sizeof(t_philostats));
+	s->id = (pthread_t *)malloc(s->nphilo * sizeof(pthread_t));
 	i = 0;
-	s->philo = (pthread_t *)malloc((s->nphilo) * sizeof(pthread_t));
 	while (i < s->nphilo)
 	{
-		a = (int *)malloc(sizeof(int));
-		*a = i;
-		if (pthread_create(&s->philo[i], NULL, &ft_runphilos, a) != 0)
+		s->philo->id = i;
+		if (pthread_create(&s->id[i], NULL, &ft_runphilos, &s->philo[i]) != 0)
 			return (ft_printf("Failed to create a thread"), 0);
 		i++;
 	}
 	i = 0;
 	while (i < s->nphilo)
 	{
-		if (pthread_join(s->philo[i], NULL) != 0)
+		if (pthread_join(s->id[i], NULL) != 0)
 			return (ft_printf("Failed to join thread"), 0);
 		i++;
 	}
