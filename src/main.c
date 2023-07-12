@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/12 13:24:27 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/12 18:32:41 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,15 +35,15 @@ int	ft_isformatted(char **argv, int argc, t_philos *s)
 		return (ft_printf("Wrong time to die\n"), 0);
 	s->teat = ft_atoi(argv[3]);
 	if (s->teat <= 0)
-		return(ft_printf("Wrong time to eat\n"), 0);
+		return (ft_printf("Wrong time to eat\n"), 0);
 	s->tsleep = ft_atoi(argv[4]);
 	if (s->tsleep <= 0)
-		return(ft_printf("Wrong time to sleep\n"), 0);
+		return (ft_printf("Wrong time to sleep\n"), 0);
 	if (argv[5])
 	{
 		s->tmusteat = ft_atoi(argv[5]);
 		if (s->tmusteat <= 0)
-			return(ft_printf("Wrong time to each philo eats\n"), 0);
+			return (ft_printf("Wrong time to each philo eats\n"), 0);
 	}
 	return (1);
 }
@@ -57,12 +57,37 @@ void	ft_initstruct(t_philos *s)
 	s->tmusteat = 0;
 }
 
+void	*ft_runphilos()
+{
+	ft_printf("I am a philo\n");
+	return (0);
+}
+
+int	ft_startphilos(t_philos *s)
+{
+	int	i;
+
+	i = 0;
+	s->philo = (pthread_t *)malloc((s->nphilo) * sizeof(pthread_t));
+	while (i < s->nphilo)
+	{
+		if (pthread_create(&s->philo[i], NULL, &ft_runphilos, NULL) != 0)
+			return (ft_printf("Failed to create a thread"), 0);
+		if (pthread_join(s->philo[i], NULL) != 0)
+			return (ft_printf("Failed to join thread"), 0);
+		i++;
+	}
+	return (1);
+}
+
 int	main(int argc, char **argv)
 {
 	t_philos	s;
 
 	ft_initstruct(&s);
 	if (!ft_isformatted(argv, argc, &s))
-		return (0);
+		return (1);
+	if (!ft_startphilos(&s))
+		return (1);
 	return (0);
 }
