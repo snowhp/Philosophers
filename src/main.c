@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/12 18:32:41 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/12 18:35:45 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,6 +73,11 @@ int	ft_startphilos(t_philos *s)
 	{
 		if (pthread_create(&s->philo[i], NULL, &ft_runphilos, NULL) != 0)
 			return (ft_printf("Failed to create a thread"), 0);
+		i++;
+	}
+	i = 0;
+	while (i < s->nphilo)
+	{
 		if (pthread_join(s->philo[i], NULL) != 0)
 			return (ft_printf("Failed to join thread"), 0);
 		i++;
