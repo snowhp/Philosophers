@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/12 18:35:45 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/12 19:21:13 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,24 +54,31 @@ void	ft_initstruct(t_philos *s)
 	s->tdie = 0;
 	s->teat = 0;
 	s->tsleep = 0;
-	s->tmusteat = 0;
+	s->tmusteat = -1;
 }
 
-void	*ft_runphilos()
+void	*ft_runphilos(void *arg)
 {
-	ft_printf("I am a philo\n");
+	int id;
+
+	id = *(int*)arg;
+	ft_printf("%i\n", id);
+	free(arg);
 	return (0);
 }
 
 int	ft_startphilos(t_philos *s)
 {
 	int	i;
+	int	*a;
 
 	i = 0;
 	s->philo = (pthread_t *)malloc((s->nphilo) * sizeof(pthread_t));
 	while (i < s->nphilo)
 	{
-		if (pthread_create(&s->philo[i], NULL, &ft_runphilos, NULL) != 0)
+		a = (int *)malloc(sizeof(int));
+		*a = i;
+		if (pthread_create(&s->philo[i], NULL, &ft_runphilos, a) != 0)
 			return (ft_printf("Failed to create a thread"), 0);
 		i++;
 	}
