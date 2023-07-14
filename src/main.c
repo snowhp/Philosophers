@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/12 20:24:20 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/14 15:10:58 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ void	ft_initstruct(t_philos *s)
 	s->teat = 0;
 	s->tsleep = 0;
 	s->tmusteat = -1;
+	s->isdead = 0;
 }
 
 int	ft_gettime()
@@ -71,24 +72,51 @@ void	*ft_runphilos(void *arg)
 	t_philostats philo;
 
 	philo = *(t_philostats*)arg;
-	ft_printf("Hello i am philo %i\n", philo.id);
-	ft_printf("%i", ft_gettime());
+	philo.lastmeal = ft_gettime();//Save join time
+	if (pthread_mutex_lock(&philo.data->print) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+	ft_printf("Hello i am philo %i\n", philo.id + 1);
+	if (pthread_mutex_unlock(&philo.data->print) != 0)
+		return (ft_printf("Failed to unlock a mutex"), NULL);
 	return (0);
+}
+
+void	ft_startphilo(t_philostats *philo, t_philos *s)
+{
+	int	i;
+
+	i = 0;
+	while (i < s->nphilo)
+	{
+		philo[i].id = i;
+		philo[i].data = s;
+		philo[i].lastmeal = 0;
+		if (i == 0)
+			philo[i].r_fork = &s->forks[s->nphilo - 1];
+		else
+			philo[i].r_fork = &s->forks[i - 1];
+		philo[i].l_fork = &s->forks[i];
+		i++;
+	}
 }
 
 int	ft_startphilos(t_philos *s)
 {
 	int	i;
+	t_philostats	*philo;
 
-	s->philo = (t_philostats *)malloc(s->nphilo * sizeof(t_philostats));
+	philo = (t_philostats *)malloc(s->nphilo * sizeof(t_philostats));
+	ft_startphilo(philo, s);
 	s->id = (pthread_t *)malloc(s->nphilo * sizeof(pthread_t));
+	s->forks = (pthread_mutex_t *)malloc(s->nphilo * sizeof(pthread_mutex_t));
 	i = 0;
+	pthread_mutex_init(&s->print, NULL);
 	while (i < s->nphilo)
 	{
-		s->philo->id = i;
-		if (pthread_create(&s->id[i], NULL, &ft_runphilos, &s->philo[i]) != 0)
+		if (pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]) != 0)
 			return (ft_printf("Failed to create a thread"), 0);
 		i++;
+		usleep(10);
 	}
 	i = 0;
 	while (i < s->nphilo)
@@ -97,6 +125,7 @@ int	ft_startphilos(t_philos *s)
 			return (ft_printf("Failed to join thread"), 0);
 		i++;
 	}
+	pthread_mutex_destroy(&s->print);
 	return (1);
 }
 
