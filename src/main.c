@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 17:27:38 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/14 17:46:41 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,7 +85,7 @@ void	*ft_philoeat(t_philostats *philo)
 	}
 	ft_printf("%i %i is eating\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
 	pthread_mutex_unlock(&philo->data->print);
-	usleep(philo->data->teat);
+	usleep(philo->data->teat * 1000);//Eat in useconds
 	philo->lastmeal = ft_gettime();//Save the last meal
 
 	/* Unlock forks */
@@ -98,8 +98,8 @@ void	*ft_philosleep(t_philostats *philo)
 {
 	pthread_mutex_lock(&philo->data->print);
 	ft_printf("%i %i is sleeping\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
-	usleep(philo->data->tsleep);
 	pthread_mutex_unlock(&philo->data->print);
+	usleep(philo->data->tsleep * 1000);
 
 	pthread_mutex_lock(&philo->data->print);
 	ft_printf("%i %i is thinking\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
@@ -118,9 +118,11 @@ void	*ft_runphilos(void *arg)
 	philo.lastmeal = ft_gettime();//Save join time
 	while (!philo.data->isdead)
 	{
+		if (philo.data->isdead == 1)
+			break;
 		ft_philoeat(&philo);
 		eat++;
-		if (eat == philo.data->tmusteat)
+		if (eat == philo.data->tmusteat || philo.data->isdead == 1)
 			break ;
 		ft_philosleep(&philo);
 		//break ;
@@ -151,7 +153,7 @@ int	ft_startphilos(t_philos *s)
 		if (pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]) != 0)
 			return (ft_printf("Failed to create a thread"), 0);
 		i++;
-		usleep(10);//Time to let the philo's seat at the table
+		usleep(1000);//Time to let the philo's seat at the table
 	}
 	i = 0;
 	while (i < s->nphilo)
