@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/12 12:57:12 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 15:10:15 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/14 15:29:44 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,3 +36,7 @@ typedef struct s_philostats
 	t_philos	*data;
 }	t_philostats;
 
+void	ft_startphilo(t_philostats *philo, t_philos *s);
+void	ft_initstruct(t_philos *s);
+void	ft_initmutex(t_philos *s);
+void	ft_destroymutex(t_philos *s);

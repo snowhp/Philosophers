@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 15:10:58 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/14 16:30:53 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,16 +48,6 @@ int	ft_isformatted(char **argv, int argc, t_philos *s)
 	return (1);
 }
 
-void	ft_initstruct(t_philos *s)
-{
-	s->nphilo = 0;
-	s->tdie = 0;
-	s->teat = 0;
-	s->tsleep = 0;
-	s->tmusteat = -1;
-	s->isdead = 0;
-}
-
 int	ft_gettime()
 {
 	struct timeval currentTime;
@@ -67,38 +57,61 @@ int	ft_gettime()
 	return (currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000);
 }
 
+void	*ft_philoeat(t_philostats *philo)
+{
+	/* Take Left Fork*/
+	if (pthread_mutex_lock(philo->l_fork) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+	/* Block print*/
+	if (pthread_mutex_lock(&philo->data->print) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+
+	ft_printf("%i %i has taken a fork\n", ft_gettime(), (*philo).id + 1);
+	/*Unblock print*/
+	if (pthread_mutex_unlock(&philo->data->print) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+	/* Take Right Fork*/
+	if (pthread_mutex_lock(philo->r_fork) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+	/* Block print*/
+	if (pthread_mutex_lock(&philo->data->print) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+
+	ft_printf("%i %i has taken a fork\n", ft_gettime(), (*philo).id + 1);
+
+	ft_printf("%i %i is eating\n", ft_gettime(), (*philo).id + 1);
+	if (pthread_mutex_unlock(&philo->data->print) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+	usleep(philo->data->teat);
+	if (pthread_mutex_unlock(philo->l_fork) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+	if (pthread_mutex_unlock(philo->r_fork) != 0)
+		return (ft_printf("Failed to lock a mutex"), NULL);
+	philo->lastmeal = ft_gettime();
+	return NULL;
+}
+
 void	*ft_runphilos(void *arg)
 {
 	t_philostats philo;
 
 	philo = *(t_philostats*)arg;
 	philo.lastmeal = ft_gettime();//Save join time
+	while (!philo.data->isdead)
+	{
+		ft_philoeat(&philo);
+		break ;
+		/* ft_philosleep();
+		ft_philothink(); */
+	}
 	if (pthread_mutex_lock(&philo.data->print) != 0)
 		return (ft_printf("Failed to lock a mutex"), NULL);
-	ft_printf("Hello i am philo %i\n", philo.id + 1);
+	//ft_printf("Hello i am philo %i\n", philo.id + 1);
 	if (pthread_mutex_unlock(&philo.data->print) != 0)
 		return (ft_printf("Failed to unlock a mutex"), NULL);
 	return (0);
 }
 
-void	ft_startphilo(t_philostats *philo, t_philos *s)
-{
-	int	i;
-
-	i = 0;
-	while (i < s->nphilo)
-	{
-		philo[i].id = i;
-		philo[i].data = s;
-		philo[i].lastmeal = 0;
-		if (i == 0)
-			philo[i].r_fork = &s->forks[s->nphilo - 1];
-		else
-			philo[i].r_fork = &s->forks[i - 1];
-		philo[i].l_fork = &s->forks[i];
-		i++;
-	}
-}
 
 int	ft_startphilos(t_philos *s)
 {
@@ -106,17 +119,17 @@ int	ft_startphilos(t_philos *s)
 	t_philostats	*philo;
 
 	philo = (t_philostats *)malloc(s->nphilo * sizeof(t_philostats));
-	ft_startphilo(philo, s);
 	s->id = (pthread_t *)malloc(s->nphilo * sizeof(pthread_t));
 	s->forks = (pthread_mutex_t *)malloc(s->nphilo * sizeof(pthread_mutex_t));
+	ft_startphilo(philo, s);
 	i = 0;
-	pthread_mutex_init(&s->print, NULL);
+	ft_initmutex(s);
 	while (i < s->nphilo)
 	{
 		if (pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]) != 0)
 			return (ft_printf("Failed to create a thread"), 0);
 		i++;
-		usleep(10);
+		usleep(10);//Time to let the philo's seat at the table
 	}
 	i = 0;
 	while (i < s->nphilo)
@@ -125,7 +138,7 @@ int	ft_startphilos(t_philos *s)
 			return (ft_printf("Failed to join thread"), 0);
 		i++;
 	}
-	pthread_mutex_destroy(&s->print);
+	ft_destroymutex(s);
 	return (1);
 }
 
