@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 16:30:53 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/14 17:27:38 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,49 +60,70 @@ int	ft_gettime()
 void	*ft_philoeat(t_philostats *philo)
 {
 	/* Take Left Fork*/
-	if (pthread_mutex_lock(philo->l_fork) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
-	/* Block print*/
-	if (pthread_mutex_lock(&philo->data->print) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
+	pthread_mutex_lock(philo->l_fork);
 
-	ft_printf("%i %i has taken a fork\n", ft_gettime(), (*philo).id + 1);
+	/* Block print*/
+	pthread_mutex_lock(&philo->data->print);
+	ft_printf("%i %i has taken a fork\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
 	/*Unblock print*/
-	if (pthread_mutex_unlock(&philo->data->print) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
+	pthread_mutex_unlock(&philo->data->print);
+
 	/* Take Right Fork*/
-	if (pthread_mutex_lock(philo->r_fork) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
+	pthread_mutex_lock(philo->r_fork);
+
 	/* Block print*/
-	if (pthread_mutex_lock(&philo->data->print) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
+	pthread_mutex_lock(&philo->data->print);
+	ft_printf("%i %i has taken a fork\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
 
-	ft_printf("%i %i has taken a fork\n", ft_gettime(), (*philo).id + 1);
-
-	ft_printf("%i %i is eating\n", ft_gettime(), (*philo).id + 1);
-	if (pthread_mutex_unlock(&philo->data->print) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
+	/* if (philo->data->isdead == 1)
+		return NULL; */
+	if (ft_gettime() - philo->lastmeal >= philo->data->tdie)
+	{
+		philo->data->isdead = 1;
+		ft_printf("%i %i died\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
+		return NULL;
+	}
+	ft_printf("%i %i is eating\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
+	pthread_mutex_unlock(&philo->data->print);
 	usleep(philo->data->teat);
-	if (pthread_mutex_unlock(philo->l_fork) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
-	if (pthread_mutex_unlock(philo->r_fork) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
-	philo->lastmeal = ft_gettime();
+	philo->lastmeal = ft_gettime();//Save the last meal
+
+	/* Unlock forks */
+	pthread_mutex_unlock(philo->l_fork);
+	pthread_mutex_unlock(philo->r_fork);
+	return NULL;
+}
+
+void	*ft_philosleep(t_philostats *philo)
+{
+	pthread_mutex_lock(&philo->data->print);
+	ft_printf("%i %i is sleeping\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
+	usleep(philo->data->tsleep);
+	pthread_mutex_unlock(&philo->data->print);
+
+	pthread_mutex_lock(&philo->data->print);
+	ft_printf("%i %i is thinking\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
+	pthread_mutex_unlock(&philo->data->print);
+
 	return NULL;
 }
 
 void	*ft_runphilos(void *arg)
 {
 	t_philostats philo;
+	int	eat;
 
+	eat = 0;
 	philo = *(t_philostats*)arg;
 	philo.lastmeal = ft_gettime();//Save join time
 	while (!philo.data->isdead)
 	{
 		ft_philoeat(&philo);
-		break ;
-		/* ft_philosleep();
-		ft_philothink(); */
+		eat++;
+		if (eat == philo.data->tmusteat)
+			break ;
+		ft_philosleep(&philo);
+		//break ;
 	}
 	if (pthread_mutex_lock(&philo.data->print) != 0)
 		return (ft_printf("Failed to lock a mutex"), NULL);
@@ -124,6 +145,7 @@ int	ft_startphilos(t_philos *s)
 	ft_startphilo(philo, s);
 	i = 0;
 	ft_initmutex(s);
+	s->startime = ft_gettime();
 	while (i < s->nphilo)
 	{
 		if (pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]) != 0)
@@ -138,6 +160,7 @@ int	ft_startphilos(t_philos *s)
 			return (ft_printf("Failed to join thread"), 0);
 		i++;
 	}
+	//ft_freeall(philo, s);
 	ft_destroymutex(s);
 	return (1);
 }
