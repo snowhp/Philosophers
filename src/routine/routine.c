@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 15:25:44 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 16:30:51 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/14 16:39:04 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,4 +73,31 @@ void	ft_destroymutex(t_philos *s)
 		pthread_mutex_destroy(&s->forks[i]);
 		i++;
 	}
+}
+
+void	ft_freeall(t_philostats *philo, t_philos *s)
+{
+	int	i;
+
+	i = 0;
+	while (i < s->nphilo)
+	{
+		free(&s->forks[i]);
+		i++;
+	}
+	free(s->forks);
+	i = 0;
+	while (i < s->nphilo)
+	{
+		free(&s->id[i]);
+		i++;
+	}
+	free(s->id);
+	i = 0;
+	while (i < s->nphilo)
+	{
+		free(&philo[i]);
+		i++;
+	}
+	free(philo);
 }

@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/12 12:57:12 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 15:29:44 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/14 17:13:57 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ typedef struct s_philos
 	int	tsleep;
 	int	tmusteat;
 	int	isdead;
+	int	startime;
 	pthread_mutex_t print;
 	pthread_mutex_t *forks;
 }	t_philos;
@@ -40,3 +41,4 @@ void	ft_startphilo(t_philostats *philo, t_philos *s);
 void	ft_initstruct(t_philos *s);
 void	ft_initmutex(t_philos *s);
 void	ft_destroymutex(t_philos *s);
+void	ft_freeall(t_philostats *philo, t_philos *s);
