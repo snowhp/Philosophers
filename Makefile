@@ -1,4 +1,6 @@
 SRCS =  src/main.c \
+		src/actions/actions.c \
+		src/init/init.c \
 		src/routine/routine.c \
 		src/routine/routine2.c
 
