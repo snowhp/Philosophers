@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 17:46:41 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/15 10:20:00 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,45 +48,31 @@ int	ft_isformatted(char **argv, int argc, t_philos *s)
 	return (1);
 }
 
-int	ft_gettime()
-{
-	struct timeval currentTime;
-
-	if (gettimeofday(&currentTime, NULL) != 0)
-		return (ft_printf("Error getting time"), 0);
-	return (currentTime.tv_sec * 1000 + currentTime.tv_usec / 1000);
-}
-
 void	*ft_philoeat(t_philostats *philo)
 {
 	/* Take Left Fork*/
-	pthread_mutex_lock(philo->l_fork);
-
-	/* Block print*/
-	pthread_mutex_lock(&philo->data->print);
-	ft_printf("%i %i has taken a fork\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
-	/*Unblock print*/
-	pthread_mutex_unlock(&philo->data->print);
-
-	/* Take Right Fork*/
-	pthread_mutex_lock(philo->r_fork);
-
-	/* Block print*/
-	pthread_mutex_lock(&philo->data->print);
-	ft_printf("%i %i has taken a fork\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
-
-	/* if (philo->data->isdead == 1)
-		return NULL; */
-	if (ft_gettime() - philo->lastmeal >= philo->data->tdie)
-	{
-		philo->data->isdead = 1;
-		ft_printf("%i %i died\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
+	if (!ft_checklastmeal(philo))
 		return NULL;
+	pthread_mutex_lock(philo->l_fork);
+	ft_print(philo, "has taken a fork");
+
+	if (!ft_checklastmeal(philo))
+			return NULL;
+	/* Take Right Fork*/
+	if (philo->data->nphilo == 1)
+		usleep(philo->data->tdie * 1000);
+	else
+	{
+		pthread_mutex_lock(philo->r_fork);
+		ft_print(philo, "has taken a fork");
 	}
-	ft_printf("%i %i is eating\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
-	pthread_mutex_unlock(&philo->data->print);
-	usleep(philo->data->teat * 1000);//Eat in useconds
+
+	/*Check last meal*/
+	if (!ft_checklastmeal(philo))
+		return NULL;
+	ft_print(philo, "is eating");
 	philo->lastmeal = ft_gettime();//Save the last meal
+	usleep(philo->data->teat * 1000);//Eat in useconds
 
 	/* Unlock forks */
 	pthread_mutex_unlock(philo->l_fork);
@@ -96,15 +82,17 @@ void	*ft_philoeat(t_philostats *philo)
 
 void	*ft_philosleep(t_philostats *philo)
 {
-	pthread_mutex_lock(&philo->data->print);
-	ft_printf("%i %i is sleeping\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
-	pthread_mutex_unlock(&philo->data->print);
+	if (!ft_checklastmeal(philo))
+		return NULL;
+	ft_print(philo, "is sleeping");
 	usleep(philo->data->tsleep * 1000);
 
-	pthread_mutex_lock(&philo->data->print);
-	ft_printf("%i %i is thinking\n", ft_gettime() - philo->data->startime, (*philo).id + 1);
-	pthread_mutex_unlock(&philo->data->print);
-
+	if (!ft_checklastmeal(philo))
+		return NULL;
+	if (philo->data->isdead != 1)
+		ft_print(philo, "is thinking");
+	if (!ft_checklastmeal(philo))
+		return NULL;
 	return NULL;
 }
 
@@ -125,7 +113,6 @@ void	*ft_runphilos(void *arg)
 		if (eat == philo.data->tmusteat || philo.data->isdead == 1)
 			break ;
 		ft_philosleep(&philo);
-		//break ;
 	}
 	if (pthread_mutex_lock(&philo.data->print) != 0)
 		return (ft_printf("Failed to lock a mutex"), NULL);
@@ -150,8 +137,16 @@ int	ft_startphilos(t_philos *s)
 	s->startime = ft_gettime();
 	while (i < s->nphilo)
 	{
-		if (pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]) != 0)
-			return (ft_printf("Failed to create a thread"), 0);
+		if (i % 2 == 0)
+			pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]);
+		i++;
+		usleep(1000);//Time to let the philo's seat at the table
+	}
+	i = 0;
+	while (i < s->nphilo)
+	{
+		if (i % 2 != 0)
+			pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]);
 		i++;
 		usleep(1000);//Time to let the philo's seat at the table
 	}

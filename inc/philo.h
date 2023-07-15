@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/12 12:57:12 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/14 17:13:57 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/15 10:16:55 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,3 +42,6 @@ void	ft_initstruct(t_philos *s);
 void	ft_initmutex(t_philos *s);
 void	ft_destroymutex(t_philos *s);
 void	ft_freeall(t_philostats *philo, t_philos *s);
+void	ft_print(t_philostats *philo, char *str);
+int	ft_gettime();
+int	ft_checklastmeal(t_philostats *philo);
