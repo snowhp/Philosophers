@@ -1,5 +1,6 @@
 SRCS =  src/main.c \
-		src/routine/routine.c
+		src/routine/routine.c \
+		src/routine/routine2.c
 
 
 OBJS = $(SRCS:.c=.o)

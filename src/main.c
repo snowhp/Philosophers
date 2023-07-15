@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/11 16:24:30 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/15 10:20:00 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/15 10:24:05 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,12 @@ int	ft_isformatted(char **argv, int argc, t_philos *s)
 void	*ft_philoeat(t_philostats *philo)
 {
 	/* Take Left Fork*/
-	if (!ft_checklastmeal(philo))
+	if (!ft_checklastmeal(philo) || philo->data->isdead == 1)
 		return NULL;
 	pthread_mutex_lock(philo->l_fork);
 	ft_print(philo, "has taken a fork");
 
-	if (!ft_checklastmeal(philo))
+	if (!ft_checklastmeal(philo) || philo->data->isdead == 1)
 			return NULL;
 	/* Take Right Fork*/
 	if (philo->data->nphilo == 1)
@@ -68,7 +68,7 @@ void	*ft_philoeat(t_philostats *philo)
 	}
 
 	/*Check last meal*/
-	if (!ft_checklastmeal(philo))
+	if (!ft_checklastmeal(philo) || philo->data->isdead == 1)
 		return NULL;
 	ft_print(philo, "is eating");
 	philo->lastmeal = ft_gettime();//Save the last meal
@@ -82,16 +82,16 @@ void	*ft_philoeat(t_philostats *philo)
 
 void	*ft_philosleep(t_philostats *philo)
 {
-	if (!ft_checklastmeal(philo))
+	if (!ft_checklastmeal(philo) || philo->data->isdead == 1)
 		return NULL;
 	ft_print(philo, "is sleeping");
 	usleep(philo->data->tsleep * 1000);
 
-	if (!ft_checklastmeal(philo))
+	if (!ft_checklastmeal(philo) || philo->data->isdead == 1)
 		return NULL;
 	if (philo->data->isdead != 1)
 		ft_print(philo, "is thinking");
-	if (!ft_checklastmeal(philo))
+	if (!ft_checklastmeal(philo) || philo->data->isdead == 1)
 		return NULL;
 	return NULL;
 }
