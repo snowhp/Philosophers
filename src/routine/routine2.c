@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 09:55:24 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/15 10:16:48 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/15 11:19:35 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,11 @@
 void	ft_print(t_philostats *philo, char *str)
 {
 	pthread_mutex_lock(&philo->data->print);
+	if (philo->data->isdprint == 1)
+	{
+		pthread_mutex_unlock(&philo->data->print);
+		return ;
+	}
 	ft_printf("%i %i", ft_gettime() - philo->data->startime, (*philo).id + 1);
 	ft_printf(" %s\n", str);
 	pthread_mutex_unlock(&philo->data->print);
@@ -34,7 +39,10 @@ int	ft_checklastmeal(t_philostats *philo)
 	if (ft_gettime() - philo->lastmeal >= philo->data->tdie)
 	{
 		philo->data->isdead = 1;
+		if (philo->data->isdprint == 1)
+			return 0;
 		ft_print(philo, "died");
+		philo->data->isdprint = 1;
 		return 0;
 	}
 	return 1;

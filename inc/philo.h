@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/12 12:57:12 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/15 10:16:55 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/15 11:17:21 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@ typedef struct s_philos
 	int	tsleep;
 	int	tmusteat;
 	int	isdead;
+	int	isdprint;
 	int	startime;
 	pthread_mutex_t print;
 	pthread_mutex_t *forks;
