@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 15:08:47 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/15 15:14:27 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/17 15:01:57 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,6 +94,7 @@ int	ft_startphilos(t_philos *s)
 	s->startime = ft_gettime();
 	ft_createpthreads(s, philo);
 	ft_destroymutex(s);
+	free(philo);
 	return (1);
 }
 
