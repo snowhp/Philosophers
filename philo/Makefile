@@ -28,7 +28,7 @@ debug: $(OBJS) $(LIBFT_LIB)
 	$(CC) $(FLAGS) -g $(SRCS) $(LIBFT_LIB) $(INCLUDE) -o $(NAME)
 
 sanitize: $(OBJS) $(LIBFT_LIB)
-	$(CC) $(FLAGS) -g -fsanitize=address $(SRCS) $(LIBFT_LIB) $(INCLUDE) -o $(NAME)
+	$(CC) $(FLAGS) -g -fsanitize=thread  $(SRCS) $(LIBFT_LIB) $(INCLUDE) -o $(NAME)
 
 
 $(LIBFT_LIB):

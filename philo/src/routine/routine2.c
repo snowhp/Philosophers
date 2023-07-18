@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 09:55:24 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/15 11:23:40 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/18 13:50:47 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,19 +32,4 @@ int	ft_gettime(void)
 	if (gettimeofday(&currenttime, NULL) != 0)
 		return (ft_printf("Error getting time"), 0);
 	return (currenttime.tv_sec * 1000 + currenttime.tv_usec / 1000);
-}
-
-/* Check for last meal*/
-int	ft_checklastmeal(t_philostats *philo)
-{
-	if (ft_gettime() - philo->lastmeal >= philo->data->tdie)
-	{
-		philo->data->isdead = 1;
-		if (philo->data->isdprint == 1)
-			return (0);
-		ft_print(philo, "died");
-		philo->data->isdprint = 1;
-		return (0);
-	}
-	return (1);
 }

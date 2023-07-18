@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 15:08:47 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/17 15:01:57 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/18 13:58:39 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,6 +74,7 @@ void	ft_createpthreads(t_philos *s, t_philostats	*philo)
 		i++;
 		usleep(1000);
 	}
+	ft_checkdeath(s, philo);
 	i = 0;
 	while (i < s->nphilo)
 	{
@@ -106,19 +107,15 @@ void	*ft_runphilos(void *arg)
 	eat = 0;
 	philo = *(t_philostats *)arg;
 	philo.lastmeal = ft_gettime();
-	while (!philo.data->isdead)
+	while (!philo.data->isdprint)
 	{
-		if (philo.data->isdead == 1)
+		if (philo.data->isdprint)
 			break ;
 		ft_philoeat(&philo);
 		eat++;
-		if (eat == philo.data->tmusteat || philo.data->isdead == 1)
+		if (eat == philo.data->tmusteat || philo.data->isdprint)
 			break ;
 		ft_philosleep(&philo);
 	}
-	if (pthread_mutex_lock(&philo.data->print) != 0)
-		return (ft_printf("Failed to lock a mutex"), NULL);
-	if (pthread_mutex_unlock(&philo.data->print) != 0)
-		return (ft_printf("Failed to unlock a mutex"), NULL);
 	return (0);
 }
