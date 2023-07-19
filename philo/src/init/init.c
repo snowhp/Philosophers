@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 15:08:47 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/18 13:58:39 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/19 13:43:14 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -62,7 +62,7 @@ void	ft_createpthreads(t_philos *s, t_philostats	*philo)
 	while (i < s->nphilo)
 	{
 		if (i % 2 == 0)
-			pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]);
+			pthread_create(&s->id[i], NULL, &ft_runphilos, (void *)&philo[i]);
 		i++;
 		usleep(1000);
 	}
@@ -70,7 +70,7 @@ void	ft_createpthreads(t_philos *s, t_philostats	*philo)
 	while (i < s->nphilo)
 	{
 		if (i % 2 != 0)
-			pthread_create(&s->id[i], NULL, &ft_runphilos, &philo[i]);
+			pthread_create(&s->id[i], NULL, &ft_runphilos, (void *)&philo[i]);
 		i++;
 		usleep(1000);
 	}
@@ -88,34 +88,41 @@ int	ft_startphilos(t_philos *s)
 	t_philostats	*philo;
 
 	philo = (t_philostats *)malloc(s->nphilo * sizeof(t_philostats));
-	s->id = (pthread_t *)malloc(s->nphilo * sizeof(pthread_t));
+	s->id = (pthread_t *)malloc((s->nphilo) * sizeof(pthread_t));
 	s->forks = (pthread_mutex_t *)malloc(s->nphilo * sizeof(pthread_mutex_t));
 	ft_startphilo(philo, s);
 	ft_initmutex(s);
 	s->startime = ft_gettime();
 	ft_createpthreads(s, philo);
-	ft_destroymutex(s);
+	ft_destroymutex(s, philo);
 	free(philo);
 	return (1);
 }
 
 void	*ft_runphilos(void *arg)
 {
-	t_philostats	philo;
-	int				eat;
+	t_philostats	*philo;
 
-	eat = 0;
-	philo = *(t_philostats *)arg;
-	philo.lastmeal = ft_gettime();
-	while (!philo.data->isdprint)
+	philo = (t_philostats *)arg;
+	philo->lastmeal = ft_gettime();
+	while (!philo->data->isdprint)
 	{
-		if (philo.data->isdprint)
+		pthread_mutex_lock(&philo->data->death);
+		if (philo->data->isdprint)
+		{
+			pthread_mutex_unlock(&philo->data->death);
 			break ;
-		ft_philoeat(&philo);
-		eat++;
-		if (eat == philo.data->tmusteat || philo.data->isdprint)
+		}
+		pthread_mutex_unlock(&philo->data->death);
+		ft_philoeat(philo);
+		pthread_mutex_lock(&philo->data->death);
+		if (philo->data->isdprint)
+		{
+			pthread_mutex_unlock(&philo->data->death);
 			break ;
-		ft_philosleep(&philo);
+		}
+		pthread_mutex_unlock(&philo->data->death);
+		ft_philosleep(philo);
 	}
 	return (0);
 }

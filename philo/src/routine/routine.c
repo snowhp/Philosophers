@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 15:25:44 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/18 13:50:36 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/19 13:42:08 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,9 +19,11 @@ void	ft_startphilo(t_philostats *philo, t_philos *s)
 	i = 0;
 	while (i < s->nphilo)
 	{
+		pthread_mutex_init(&philo->meal, NULL);
 		philo[i].id = i;
 		philo[i].data = s;
 		philo[i].lastmeal = 0;
+		philo[i].nmeals = 0;
 		if (i == 0)
 			philo[i].r_fork = &s->forks[s->nphilo - 1];
 		else
@@ -48,6 +50,7 @@ void	ft_initmutex(t_philos *s)
 
 	i = 0;
 	pthread_mutex_init(&s->print, NULL);
+	pthread_mutex_init(&s->death, NULL);
 	while (i < s->nphilo)
 	{
 		pthread_mutex_init(&s->forks[i], NULL);
@@ -55,14 +58,16 @@ void	ft_initmutex(t_philos *s)
 	}
 }
 
-void	ft_destroymutex(t_philos *s)
+void	ft_destroymutex(t_philos *s, t_philostats *philo)
 {
 	int	i;
 
 	i = 0;
 	pthread_mutex_destroy(&s->print);
+	pthread_mutex_destroy(&s->death);
 	while (i < s->nphilo)
 	{
+		pthread_mutex_destroy(&philo->meal);
 		pthread_mutex_destroy(&s->forks[i]);
 		i++;
 	}
