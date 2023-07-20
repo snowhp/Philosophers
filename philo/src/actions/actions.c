@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 15:09:56 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/20 10:31:12 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/20 11:03:27 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,11 @@ void	*ft_philoeat(t_philostats *philo)
 	pthread_mutex_lock(philo->l_fork);
 	ft_print(philo, "has taken a fork");
 	if (philo->data->nphilo == 1)
-		usleep(philo->data->tdie * 1000);
+	{
+		usleep((philo->data->tdie + 10) * 1000);
+		pthread_mutex_unlock(philo->l_fork);
+		return (NULL);
+	}
 	else
 	{
 		pthread_mutex_lock(philo->r_fork);
@@ -53,7 +57,7 @@ void	*ft_checkdeath(t_philos *s, t_philostats	*philo)
 	i = 0;
 	while (1)
 	{
-		if (total == s->nphilo - 1)
+		if (total == s->nphilo)
 		{
 			pthread_mutex_lock(&philo->data->death);
 			philo->data->isdprint = 1;
