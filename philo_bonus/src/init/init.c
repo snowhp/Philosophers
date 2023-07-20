@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 15:08:47 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/19 14:52:39 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/20 13:35:00 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,7 +93,7 @@ int	ft_startphilos(t_philos *s)
 	ft_initsem(s);
 	s->startime = ft_gettime();
 	ft_createpthreads(s, philo);
-	ft_destroysem(s);
+	ft_destroysem(s, philo);
 	free(philo);
 	return (1);
 }
@@ -103,7 +103,7 @@ void	*ft_runphilos(void *arg)
 	t_philostats	*philo;
 
 	philo = (t_philostats *)arg;
-	philo->lastmeal = ft_gettime();
+	ft_setlastmeal(philo);
 	while (!philo->data->isdprint)
 	{
 		sem_wait(philo->data->death);
