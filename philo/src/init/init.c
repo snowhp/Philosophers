@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 15:08:47 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/19 13:43:14 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/20 10:56:25 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,7 +104,7 @@ void	*ft_runphilos(void *arg)
 	t_philostats	*philo;
 
 	philo = (t_philostats *)arg;
-	philo->lastmeal = ft_gettime();
+	ft_setlastmeal(philo);
 	while (!philo->data->isdprint)
 	{
 		pthread_mutex_lock(&philo->data->death);

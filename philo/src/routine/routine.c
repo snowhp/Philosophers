@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 15:25:44 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/19 13:42:08 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/20 10:19:13 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,8 @@ void	ft_startphilo(t_philostats *philo, t_philos *s)
 	i = 0;
 	while (i < s->nphilo)
 	{
-		pthread_mutex_init(&philo->meal, NULL);
+		pthread_mutex_init(&philo[i].meal, NULL);
+		pthread_mutex_init(&philo[i].numeal, NULL);
 		philo[i].id = i;
 		philo[i].data = s;
 		philo[i].lastmeal = 0;
@@ -67,7 +68,8 @@ void	ft_destroymutex(t_philos *s, t_philostats *philo)
 	pthread_mutex_destroy(&s->death);
 	while (i < s->nphilo)
 	{
-		pthread_mutex_destroy(&philo->meal);
+		pthread_mutex_destroy(&philo[i].meal);
+		pthread_mutex_destroy(&philo[i].numeal);
 		pthread_mutex_destroy(&s->forks[i]);
 		i++;
 	}

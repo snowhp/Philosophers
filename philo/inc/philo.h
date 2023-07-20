@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/12 12:57:12 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/19 14:04:01 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/20 10:56:57 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_philostats
 	int				lastmeal;
 	int				id;
 	int				nmeals;
+	pthread_mutex_t	numeal;
 	pthread_mutex_t	meal;
 	pthread_mutex_t	*l_fork;
 	pthread_mutex_t	*r_fork;
@@ -57,5 +58,7 @@ void	*ft_philosleep(t_philostats *philo);
 void	*ft_runphilos(void *arg);
 void	*ft_checkdeath(t_philos *s, t_philostats	*philo);
 int		ft_checkisdeath(t_philostats *philo);
+int		ft_eatall(t_philostats *philo);
+void	ft_setlastmeal(t_philostats *philo);
 
 #endif
