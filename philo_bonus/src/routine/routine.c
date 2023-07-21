@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 15:25:44 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/20 13:34:57 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/21 11:00:51 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,6 +45,7 @@ void	ft_initstruct(t_philos *s)
 	s->tmusteat = -1;
 	s->isdead = 0;
 	s->isdprint = 0;
+	s->startime = 0;
 }
 
 void	ft_initsem(t_philos *s)
