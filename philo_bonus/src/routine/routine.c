@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/14 15:25:44 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/21 11:00:51 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/21 11:15:15 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 void	ft_startphilo(t_philostats *philo, t_philos *s)
 {
-	int	i;
+	int		i;
 	char	*temp;
 
 	i = 0;
