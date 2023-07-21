@@ -7,7 +7,7 @@ SRCS =  src/main.c \
 
 OBJS = $(SRCS:.c=.o)
 
-NAME = philo
+NAME = philo_bonus
 LIBFT		= libft.a
 LIBFT_DIR := ./libft
 LIBFT_LIB := $(LIBFT_DIR)/libft.a
