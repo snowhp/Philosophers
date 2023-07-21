@@ -6,7 +6,7 @@
 /*   By: tde-sous <tde-sous@student.42porto.com>    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/07/15 15:09:56 by tde-sous          #+#    #+#             */
-/*   Updated: 2023/07/20 13:19:03 by tde-sous         ###   ########.fr       */
+/*   Updated: 2023/07/21 11:12:15 by tde-sous         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,6 +105,6 @@ int	ft_checkisdeath(t_philostats *philo)
 		sem_post(philo->data->death);
 		return (0);
 	}
-	sem_post(philo->data->death);
+	sem_post(philo->meal);
 	return (1);
 }
